@@ -43,7 +43,7 @@ app.get("/", (req, res) => {
   });
 });
 
-app.get("/health", (req, res) => {
+app.get("/health_Check", (req, res) => {
   res.json({ status: "ok" });
 });
 
