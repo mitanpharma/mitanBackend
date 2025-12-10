@@ -104,13 +104,15 @@ export const loginController = asyncHandler(async (req, res) => {
   const options = {
     httpOnly: true,
     secure: true,
-    sameSite: "strict",
+    sameSite: "none",
   };
 
   const accessToken = doesUserExist.generateAccessToken();
   const refreshToken = doesUserExist.generateRefreshToken();
 
   await storeRefreshToken(doesUserExist._id, refreshToken);
+  console.log(accessToken,refreshToken);
+  
 
   return res
     .status(200)
@@ -157,7 +159,7 @@ export const refreshAccessToken = asyncHandler(async (req, res) => {
     const options = {
       httpOnly: true,
       secure: true,
-      sameSite: "strict",
+      sameSite: "none",
     };
 
     return res
