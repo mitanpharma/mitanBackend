@@ -127,3 +127,69 @@ export const loginController = asyncHandler(async (req, res) => {
       })
     );
 });
+
+
+///////////////////////////////////Refresh Token Route/////////////////////////////////
+
+export const refreshAccessToken = asyncHandler(async (req, res) => {
+  const refreshtoken = req.cookies.refreshtoken;
+  try {
+    if (!refreshtoken) {
+      throw new ApiError(401, [], "Refresh Token Not Found");
+    }
+
+    const decoded = jwt.verify(refreshtoken, process.env.REFRESH_TOKEN_SECRET);
+
+    const storedRefreshToken = await redis.get(`refreshtoken:${decoded._id}`);
+
+    if (storedRefreshToken !== refreshtoken) {
+      throw new ApiError(404, [], "Refresh Token Invalid");
+    }
+
+    const doesUserExist = await User.findById(decoded._id);
+
+    if (!doesUserExist) {
+      throw new ApiError(404, [], "User Not Found");
+    }
+
+    const accessToken = doesUserExist.generateAccessToken();
+
+    const options = {
+      httpOnly: true,
+      secure: true,
+      sameSite: "strict",
+    };
+
+    return res
+      .status(200)
+      .cookie("accesstoken", accessToken, options)
+      .json(new ApiResponse(200, "Access Token Refreshed Successfully"));
+  } catch (error) {
+    throw new ApiError(401, [], error.message, "Failed to refresh token");
+  }
+});
+
+///// User Logout Route//////////////
+
+export const userLogout = asyncHandler(async (req, res) => {
+  const refreshToken = req.cookies.refreshToken;
+  if (!refreshToken) {
+    throw new ApiError(401, [], "No refresh token found");
+  }
+
+  const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+
+  await redis.del(`refreshtoken:${decoded._id}`);
+
+  const options = {
+    httpOnly: true,
+    secure: true,
+    sameSite: "strict",
+  };
+
+  return res
+    .clearCookie("accessToken", options)
+    .clearCookie("refreshToken", options)
+    .status(200)
+    .json(new ApiResponse(200, "User Logged Out"));
+});

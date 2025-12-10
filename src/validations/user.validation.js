@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { email, z } from "zod";
 
 export const signupValidationSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -25,4 +25,15 @@ export const signupValidationSchema = z.object({
 export const loginValidationSchema = z.object({
   email: z.email("email is required"),
   password: z.string().min(1),
+});
+
+export const userContactValidationSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  email: z.email("email is required"),
+  phone: z
+    .string()
+    .min(10, "Phone number must be at least 10 digits")
+    .max(15, "Phone number must be at most 15 digits")
+    .regex(/^[0-9+\s()-]*$/, "Invalid phone number format"),
+  message: z.string().min(5, "message must be of 5 characters").max(1000),
 });

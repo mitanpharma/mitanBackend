@@ -1,6 +1,7 @@
 import express from "express";
 import cookieParser from "cookie-parser";
 import authFunctionality from "./routes/user.routes.js";
+import contactDetails from "./routes/userContact.routes.js";
 import cors from "cors";
 
 const app = express();
@@ -18,10 +19,11 @@ const corsOptions = {
   origin: function (origin, callback) {
     // Allow requests with no origin (like mobile apps, Postman, or same-origin)
     if (!origin) return callback(null, true);
-    
+
     // Check if origin is in allowed list
     if (allowedOrigins.indexOf(origin) === -1) {
-      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+      const msg =
+        "The CORS policy for this site does not allow access from the specified Origin.";
       return callback(new Error(msg), false);
     }
     return callback(null, true);
@@ -62,6 +64,10 @@ app.get("/test", (req, res) => {
 
 // User authentication routes
 app.use("/User", authFunctionality);
+
+//User Contact Details Route
+
+app.use("/api", contactDetails);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
