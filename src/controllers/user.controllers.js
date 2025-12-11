@@ -7,7 +7,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { User } from "../models/user.model.js";
 import { redis } from "../utils/redis.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
-
+import jwt from "jsonwebtoken";
 
 ///// User signup Route//////////////
 
@@ -111,8 +111,6 @@ export const loginController = asyncHandler(async (req, res) => {
   const refreshToken = doesUserExist.generateRefreshToken();
 
   await storeRefreshToken(doesUserExist._id, refreshToken);
-  console.log(accessToken,refreshToken);
-  
 
   return res
     .status(200)
@@ -129,7 +127,6 @@ export const loginController = asyncHandler(async (req, res) => {
       })
     );
 });
-
 
 ///////////////////////////////////Refresh Token Route/////////////////////////////////
 
@@ -175,6 +172,7 @@ export const refreshAccessToken = asyncHandler(async (req, res) => {
 
 export const userLogout = asyncHandler(async (req, res) => {
   const refreshToken = req.cookies.refreshToken;
+
   if (!refreshToken) {
     throw new ApiError(401, [], "No refresh token found");
   }
