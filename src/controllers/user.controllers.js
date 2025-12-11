@@ -186,7 +186,7 @@ export const userLogout = asyncHandler(async (req, res) => {
   const options = {
     httpOnly: true,
     secure: true,
-    sameSite: "strict",
+    sameSite: "none",
   };
 
   return res
