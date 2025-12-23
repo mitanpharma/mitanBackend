@@ -2,6 +2,7 @@ import express from "express";
 import cookieParser from "cookie-parser";
 import authFunctionality from "./routes/user.routes.js";
 import contactDetails from "./routes/userContact.routes.js";
+import medicineRoutes from "./routes/medicine.routes.js";
 import cors from "cors";
 
 const app = express();
@@ -60,6 +61,9 @@ app.get("/test", (req, res) => {
     message: "CORS is working correctly!",
   });
 });
+
+app.use("/api/medicines", medicineRoutes);
+
 
 // User authentication routes
 app.use("/User", authFunctionality);

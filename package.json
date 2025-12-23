@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "dev": "nodemon src/main.js",
-    "start": "node src/main.js"
+    "start": "node src/main.js",
+    "seed": "node src/scripts/seedMedicines.js"
   },
   "keywords": [],
   "author": "",
