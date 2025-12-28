@@ -1,18 +1,34 @@
 import { Medicine } from "../models/medicines.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
-// Get all medicines with pagination
 export const getAllMedicines = asyncHandler(async (req, res) => {
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 50;
   const skip = (page - 1) * limit;
 
-  const medicines = await Medicine.find()
-    .sort({ S_NO: 1 }) // Sort by serial number
-    .skip(skip)
-    .limit(limit);
+  // Get search and filter from query params
+  const searchTerm = req.query.search || "";
+  const type = req.query.type || "";
 
-  const total = await Medicine.countDocuments();
+  // Build query object
+  let query = {};
+
+  if (searchTerm) {
+    query.PRODUCT = { $regex: searchTerm, $options: "i" };
+  }
+
+  if (type && type !== "all") {
+    query.MEDICINE_TYPE = { $regex: `^${type}$`, $options: "i" };
+  }
+
+ 
+  const medicines = await Medicine.find(query)
+    .sort({ S_NO: 1 })
+    .skip(skip)
+    .limit(limit)
+    .lean(); 
+
+  const total = await Medicine.countDocuments(query);
 
   res.status(200).json({
     success: true,
@@ -26,7 +42,42 @@ export const getAllMedicines = asyncHandler(async (req, res) => {
   });
 });
 
+//  Backend Route for Product Counts
+
+export const getMedicineCounts = asyncHandler(async (req, res) => {
+  const searchTerm = req.query.search || '';
+  
+  let baseQuery = {};
+  if (searchTerm) {
+    baseQuery.PRODUCT = { $regex: searchTerm, $options: 'i' };
+  }
+
+  const counts = await Promise.all([
+    Medicine.countDocuments(baseQuery),
+    Medicine.countDocuments({ ...baseQuery, MEDICINE_TYPE: /^tablet$/i }),
+    Medicine.countDocuments({ ...baseQuery, MEDICINE_TYPE: /^capsule$/i }),
+    Medicine.countDocuments({ ...baseQuery, MEDICINE_TYPE: /^syrup$/i }),
+    Medicine.countDocuments({ ...baseQuery, MEDICINE_TYPE: /^injection$/i }),
+    Medicine.countDocuments({ ...baseQuery, MEDICINE_TYPE: /^infusion$/i }),
+  ]);
+
+  res.json({
+    success: true,
+    counts: {
+      all: counts[0],
+      tablet: counts[1],
+      capsule: counts[2],
+      syrup: counts[3],
+      injection: counts[4],
+      infusion: counts[5],
+    }
+  });
+});
+
+
+
 // Search medicines by product name
+
 export const searchMedicines = asyncHandler(async (req, res) => {
   const { q } = req.query; // search query
 
