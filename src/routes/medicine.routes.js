@@ -1,20 +1,20 @@
-import express from "express";
-import {
-  getAllMedicines,
-  getMedicineCounts,
-  searchMedicines,
-} from "../controllers/medicineController.js";
-const router = express.Router();
+// import express from "express";
+// import {
+//   getAllMedicines,
+//   getMedicineCounts,
+//   searchMedicines,
+// } from "../controllers/medicineController.js";
+// const router = express.Router();
 
-// Get all medicines (with pagination)
-router.get("/", getAllMedicines);
+// // Get all medicines (with pagination)
+// router.get("/", getAllMedicines);
 
-// get all medicines count
+// // get all medicines count
 
-router.get("/counts", getMedicineCounts);
+// router.get("/counts", getMedicineCounts);
 
-// Search medicines by name
-router.get("/search", searchMedicines);
+// // Search medicines by name
+// router.get("/search", searchMedicines);
 
-export default router;
+// export default router;
  
